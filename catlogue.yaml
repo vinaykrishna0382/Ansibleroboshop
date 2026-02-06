@@ -24,3 +24,45 @@
   - name: print the directory status
     ansible.buitin.debug:
       msg: "output:{{dirctory}}"
+  - when: directory.stat.exist== False
+    name: create /app directory
+    ansible.buitin.file:
+      path: /app
+      state: directory
+  - name: download catalogue artifact
+    ansible.buitin.get_url:
+      url: https://roboshop-builds.s3.amazonaws.com/catalogue.zip
+      dest: /tmp
+  - name: extract catalogue artifact
+    ansible.buitin.unarchive:
+      src: /tmp/catlogue.zip
+      dest: /app
+      remote_src: yes
+  - name: install dependencies
+    ansible.buitin.command: npm install
+      args:
+        chdir: /app
+  - name: copy catalogue service
+    ansible.builtin.service:
+      src: catalogue.service
+      dest: /etc/systemd/system/catlogue.service
+  - name: deamon reload
+    ansible.builtin.systemd:
+      deamon_reload: true
+  - name: copy mongo repo to yum.repos.d
+    ansible.builtin.copy:
+      src: mongodb.repo
+      dest: /etc/yum.reos.d/mongo.repo
+  - name: install mongodb
+    ansible.builtin.yum:
+      name: mongodb-org-shell
+      state: installed
+  - name: load catalogue data
+    ansible.buitin.command: mongo --host mongodb private ip address < /app/schema/catalogue.js
+  - name: restart catalogue
+    ansible.builtin.service:
+      name: catalogue
+      state: restarted
+      enabled: yes
+      
+  
