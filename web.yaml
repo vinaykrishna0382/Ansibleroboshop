@@ -13,7 +13,7 @@
       enabled: yes
   - name: remove html directory
     ansible.buitin.file:
-      path: usr/share/nginx/html
+      path: /usr/share/nginx/html
       state: absent
   - name: create html directory
     ansible.buitin.file:
@@ -37,5 +37,5 @@
       name: nginx
       state: restarted
       enabled: yes
-      
+
 
