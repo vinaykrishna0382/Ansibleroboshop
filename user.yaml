@@ -1,5 +1,5 @@
-- name: install catalogue component
-  hosts: catalogue
+- name: install user component
+  hosts: user
   become: yes
   tasks: 
   - name: setup npm source
@@ -29,11 +29,11 @@
     ansible.buitin.file:
       path: /app
       state: directory
-  - name: download catalogue artifact
+  - name: download user artifact
     ansible.buitin.get_url:
-      url: https://roboshop-builds.s3.amazonaws.com/catalogue.zip
+      url: https://roboshop-builds.s3.amazonaws.com/user.zip
       dest: /tmp
-  - name: extract catalogue artifact
+  - name: extract user artifact
     ansible.buitin.unarchive:
       src: /tmp/catlogue.zip
       dest: /app
@@ -42,9 +42,9 @@
     ansible.buitin.command: npm install
     args:
       chdir: /app
-  - name: copy catalogue service
+  - name: copy user service
     ansible.builtin.copy:
-      src: catalogue.service
+      src: user.service
       dest: /etc/systemd/system/catlogue.service
   - name: daemon reload
     ansible.builtin.systemd:
@@ -57,11 +57,11 @@
     ansible.builtin.yum:
       name: mongodb-org-shell
       state: installed
-  - name: load catalogue data
-    ansible.buitin.command: mongo --host mongodb private ip address < /app/schema/catalogue.js
-  - name: restart catalogue
+  - name: load user data
+    ansible.buitin.command: mongo --host mongodb private ip address < /app/schema/user.js
+  - name: restart user
     ansible.builtin.service:
-      name: catalogue
+      name: user
       state: restarted
       enabled: yes
 
