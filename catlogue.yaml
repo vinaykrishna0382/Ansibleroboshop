@@ -5,41 +5,41 @@
   - name: setup npm source
     ansible.builtin.shell: "curl -sL https://rpm.nodesource.com/setup_lts.x | bash"
   - name: install nodejs
-    ansible.buitin.yum:
+    ansible.builtin.yum:
       name: nodejs
       status: installed
   - name: check roboshop user exist or not
-    ansible.buitin.command: id roboshop
+    ansible.builtin.command: id roboshop
     register: out
     igonore_errors: true
   - when: out.rc !=0
     name: create user roboshop
     become: yes
-    ansible.buitin.user:
+    ansible.builtin.user:
       name: roboshop
   - name: check app directory exist or not
-    ansible.buitin.stat:
+    ansible.builtin.stat:
       path: /app
     register: directory
   - name: print the directory status
-    ansible.buitin.debug:
+    ansible.builtin.debug:
       msg: "output:{{dirctory}}"
   - when: directory.stat.exist== False
     name: create /app directory
-    ansible.buitin.file:
+    ansible.builtin.file:
       path: /app
       state: directory
   - name: download catalogue artifact
-    ansible.buitin.get_url:
+    ansible.builtin.get_url:
       url: https://roboshop-builds.s3.amazonaws.com/catalogue.zip
       dest: /tmp
   - name: extract catalogue artifact
-    ansible.buitin.unarchive:
+    ansible.builtin.unarchive:
       src: /tmp/catlogue.zip
       dest: /app
       remote_src: yes
   - name: install dependencies
-    ansible.buitin.command: npm install
+    ansible.builtin.command: npm install
     args:
       chdir: /app
   - name: copy catalogue service
@@ -58,7 +58,7 @@
       name: mongodb-org-shell
       state: installed
   - name: load catalogue data
-    ansible.buitin.command: mongo --host mongodb private ip address < /app/schema/catalogue.js
+    ansible.builtin.command: mongo --host mongodb private ip address < /app/schema/catalogue.js
   - name: restart catalogue
     ansible.builtin.service:
       name: catalogue

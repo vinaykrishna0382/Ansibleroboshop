@@ -3,22 +3,22 @@
   become: yes
   tasks:
   - name: configure rabbitmq yum repos
-    ansible.buitin.shell: "{{item}}"
+    ansible.builtin.shell: "{{item}}"
     loop:
     - "curl -s https://packagecloud.io/install/repositories/rabbitmq/erlang/script.rpm.sh | bash"
     - "curl -s https://packagecloud.io/install/repositories/rabbitmq/rabbitmq-server/script.rpm.sh | bash"
   - name: install rabbitmq
-    ansible.buitin.yum:
+    ansible.builtin.yum:
       name: rabbitmq-server
       state: installed
   - name: restart rabbitmq
-    ansible.buitin.service:
+    ansible.builtin.service:
       name: rabbitmq-server
       state: restarted
-      enable: true
+      enabled: true
   - name: create rabbitmq user
-    ansible.buitin.shell: rabbitmqctl add_user roboshop roboshop123
+    ansible.builtin.shell: rabbitmqctl add_user roboshop roboshop123
   - name: setup pemissions
-    ansible.buitin.shell: rabbitmqctl set_permissions -p / roboshop ".*" ".*" ".*"
-    
+    ansible.builtin.shell: rabbitmqctl set_permissions -p / roboshop ".*" ".*" ".*"
+
   

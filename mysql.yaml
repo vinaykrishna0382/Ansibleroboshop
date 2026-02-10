@@ -3,19 +3,19 @@
   become: yes
   tasks:
   - name: disable current my sql version
-    ansible.buitin.command: yum module disable mysql -y 
+    ansible.builtin.command: yum module disable mysql -y 
   - name: copy mysql repo
-    ansible.buitin.copy:
+    ansible.builtin.copy:
       src: mysql.repo
       dest: /etc/yum.repos.d/mysql.repo
   - name: install my sql community server
-    ansible.buitin.yum:
+    ansible.builtin.yum:
       name: mysql-community-server
       state: installed
   - name: restart mysql
-    ansible.buitin.service:
+    ansible.builtin.service:
       name: mysqld
       state: started
-      enable: true
+      enabled: true
   - name: setup mysql root password
-    ansible.buitin.command: mysql_secure_installation --set-root-pass RoboShop@1
+    ansible.builtin.command: mysql_secure_installation --set-root-pass RoboShop@1
