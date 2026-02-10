@@ -1,0 +1,62 @@
+- name: install shipping component
+  hosts: shipping
+  become: yes
+  tasks:
+  - name: install maven 
+    ansible.buitin.yum:
+      name: maven
+      state: installed
+  - name: check roboshop user exist or not
+    ansible.buitin.command: id roboshop
+    register: out
+    igonore_errors: true
+  - when: out.rc !=0
+    name: create user roboshop
+    become: yes
+    ansible.buitin.user:
+      name: roboshop
+  - name: check app directory exist or not
+    ansible.buitin.stat:
+      path: /app
+    register: directory
+  - name: print the directory status
+    ansible.buitin.debug:
+      msg: "output:{{dirctory}}"
+  - when: directory.stat.exist== False
+    name: create /app directory
+    ansible.buitin.file:
+      path: /app
+      state: directory
+  - name: download shipping and extract
+    ansible.buitin.unarchive:
+      src: https://roboshop-builds.s3.amazonaws.com/shipping.zip
+      dest: /app
+      remote_src: yes
+  - name: maven package
+    ansible.buitin.command: mvn clean package
+    args:
+      chdir: /app
+  - name: rename jar file
+    ansible.buitin.command: mv target/shipping-1.0.jar shipping.jar
+    args:
+      chdir: /app
+  - name: copy shipping service
+    ansible.buitin.copy:
+      src: shipping.service
+      dest: /etc/systemd/system/shipping.service
+  - name: daemon reload
+    ansible.builtin.systemd:
+      daemon_reload: true
+  - name: install mysql client
+    ansible.buitin.yum:
+      name: mysql
+      state: installed
+  - name: load mysql schema
+    ansible.buitin.shell: mysql -h <MYSQL-SERVER-IPADDRESS> -uroot -pRoboShop@1 < /app/schema/shipping.sql 
+  - name: restart and enable shipping
+    ansible.buitin.service:
+      name: shipping
+      state: restarted
+      enable: true
+      
+
